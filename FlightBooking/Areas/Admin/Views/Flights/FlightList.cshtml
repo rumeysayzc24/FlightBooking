@@ -968,36 +968,28 @@
                         }
                         else
                         {
-                            @foreach (var f in Model)
+                            foreach (var f in Model)
                             {
-                                // 1. Durum Kontrolü (Null-Safe)
-                                var (statusLabel, statusCss) = (!string.IsNullOrEmpty(f.Status) && statusMap.TryGetValue(f.Status, out var sv))
-                                ? sv
-                                : (f.Status ?? "Planlandı", "sb-scheduled");
+                                var (statusLabel, statusCss) = statusMap.TryGetValue(f.Status, out var sv)
+                                ? sv : (f.Status, "sb-scheduled");
 
-                                // 2. Doluluk Hesaplama
                                 int occ = f.TotalSeats > 0
                                 ? (int)Math.Round((double)(f.TotalSeats - f.AvailableSeats) / f.TotalSeats * 100)
                                 : 0;
 
                                 string capClass = occ >= 85 ? "cap-red" : occ >= 60 ? "cap-yellow" : "cap-green";
 
-                                // 3. Süre Hesaplama
                                 int dH = f.DurationMinutes / 60;
                                 int dM = f.DurationMinutes % 60;
                                 string durStr = dH > 0 ? $"{dH}s {dM}dk" : $"{dM}dk";
 
-                                // 4. Havayolu Kontrolü (Null-Safe)
-                                var (alBg, alFg, alName) = !string.IsNullOrEmpty(f.AirlineCode)
-                                ? GetAirline(f.AirlineCode)
-                                : ("#e2e8f0", "#475569", "Belirtilmedi");
+                                var (alBg, alFg, alName) = GetAirline(f.AirlineCode);
 
-                                // 5. TR Etiketi ve .ToLower() Güvenlik Önlemleri (?. Kulanımı)
-                                <tr data-flight-no="@(f.FlightNumber?.ToLower() ?? "")"
-                                    data-dep-airport="@(f.DepartureAirportCode?.ToLower() ?? "") @(f.DepartureAirportName?.ToLower() ?? "")"
-                                    data-arr-airport="@(f.ArrivalAirportCode?.ToLower() ?? "") @(f.ArrivalAirportName?.ToLower() ?? "")"
-                                    data-airline="@(f.AirlineCode ?? "")"
-                                    data-status="@(f.Status ?? "")">
+                                <tr data-flight-no="@f.FlightNumber.ToLower()"
+                                    data-dep-airport="@f.DepartureAirportCode.ToLower() @f.DepartureAirportName.ToLower()"
+                                    data-arr-airport="@f.ArrivalAirportCode.ToLower() @f.ArrivalAirportName.ToLower()"
+                                    data-airline="@f.AirlineCode"
+                                    data-status="@f.Status">
 
                                     @* Flight No *@
                                     <td>
@@ -1096,13 +1088,14 @@
                                     <td>
                                         <div class="cell-actions">
 
+                                       
+
+                                        
                                             <a href="/Admin/Flights/FlightDetail/@f.FlightId"
                                                class="act act-view">
                                                 <i class="bi bi-eye-fill"></i>
                                                 <span class="act-label">Görüntüle</span>
                                             </a>
-
-
 
                                             <a asp-area="Admin"
                                                asp-controller="Flights"
@@ -1112,7 +1105,6 @@
                                                 <i class="bi bi-pencil-fill"></i>
                                                 <span class="act-label">Düzenle</span>
                                             </a>
-
 
                                             <a href="/Admin/Booking/CreateBooking/@f.FlightId"
                                                class="act act-book">
