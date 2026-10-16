@@ -23,7 +23,7 @@ namespace FlightBooking.Areas.Admin.Controllers
 
         public async Task<IActionResult> NoShowAnalsis()
         {
-            var values = await _noShowService.GetSlotBasedNoShowRateAsync();
+            var values = await _noShowService.GetSlotBasedNoShowRatesAsync();
             return View(values);
         }
 
